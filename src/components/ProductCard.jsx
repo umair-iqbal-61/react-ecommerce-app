@@ -9,7 +9,7 @@ function ProductCard() {
   const [error, setError] = useState(null)
   const [search, setSearch] = useState("")
   const { cart, addToCart } = useContext(CartContext)
-  x
+
   const filterProducts = products.filter(product =>
     product.title.toLowerCase().includes(search.toLowerCase())
   )
