@@ -9,10 +9,14 @@ function ProductCard() {
   const [error, setError] = useState(null)
   const [search, setSearch] = useState("")
   const { cart, addToCart } = useContext(CartContext)
+  const [category, setCategory] = useState("all")
+  const [categories, setCategories] = useState([])
 
-  const filterProducts = products.filter(product =>
-    product.title.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredProducts = products.filter(product => {
+    const matchSearch = product.title.toLowerCase().includes(search.toLowerCase())
+    const matchCategory = category === "all" || product.category === category
+    return matchSearch && matchCategory
+  })
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,6 +38,20 @@ function ProductCard() {
     localStorage.setItem("cart", JSON.stringify(cart))
   }, [cart])
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('https://fakestoreapi.com/products/categories')
+        const data = await res.json()
+        setCategories(data)
+      }
+      catch (err) {
+        console.error(err)
+      }
+    }
+    fetchCategories()
+  })
+
   if (loading) return <h2>loading...</h2>
   if (error) return <h2>{error}</h2>
 
@@ -51,12 +69,25 @@ function ProductCard() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full max-w-md p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="all">All Categories</option>
+            {
+              categories.map(cat => (
+                <option value={cat} key={cat}>{cat}</option>
+              ))
+            }
+          </select>
         </div>
 
         {/* Products */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {
-            filterProducts.map(product => (
+            filteredProducts.map(product => (
               <div key={product.id} className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition duration-300">
                 <img className="h-40 mx-auto object-contain mb-3" src={product.image} alt={product.title} />
 
