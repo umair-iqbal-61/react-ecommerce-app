@@ -1,3 +1,4 @@
+import toast from "react-hot-toast"
 import { useState, useEffect } from "react"
 import { CartContext } from "./CartContext"
 
@@ -25,6 +26,21 @@ export const CartProvider = ({ children }) => {
 
       return [...prev, { ...product, quantity: 1 }]
     })
+
+    if (cart.find(item => item.id === product.id)) {
+      toast("Product already in cart!", {
+        icon: "⚠️",
+        style: {
+          background: "#facc15",
+          color: "#000",
+        },
+      })
+
+      return
+    }
+
+
+    toast.success("Product added to cart 🛒")
   }
 
   return (
